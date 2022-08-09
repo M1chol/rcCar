@@ -1,7 +1,7 @@
 # Samochód zdalnie sterowany
 Uwaga projekt nie jest jeszcze skończony!
 
-Poniżej przedstawie szczegółowy opis budowy prostego samochodu autonomicznego. Części które użyłem znajdują się w lokalizacji rcCar/Inne/czesci.
+Poniżej przedstawie szczegółowy opis budowy prostego samochodu autonomicznego. Części które użyłem znajdują się [tutaj](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md).
 
 Jako podwozie użyłem zestawu do samodzielnego montażu (patrz plik z częściami). Samochód zasilany jest Baterią litowo-polimerową z 3 ogniwami która po naładowaniu daje napięcie ok. 12V Aby zasilić Arduino, Raspberry Pi oraz serwo które przyjmują 5V wykorzystałem przetwornice step-down. Ja użyłem DFR0205 ale tańsze zamienniki równiesz będą dobre. Jako sterownik silnika zastosowałem tani modułu wysokonapięciowego BTS7960D.
 
