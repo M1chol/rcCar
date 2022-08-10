@@ -1,12 +1,12 @@
 import serial
-
+port="/dev/ttyUSB0"
 try:
-    sr=serial.Serial("/dev/ttyUSB0",9600, timeout=0.5)
+    sr=serial.Serial(port,9600, timeout=0.5)
 except:
-    print('Blad podczas polaczenia z dev/ttyUSB0')
+    print('Blad podczas polaczenia z',port)
     quit()
 else:
-    print('Polaczono z dev/ttyUSB0')
+    print('Polaczono z',port)
     
 sr.flush()
 print('Rozpoczynam komunikacje')
@@ -17,4 +17,3 @@ while slucham!=False:
         slucham=False
     else:
         sr.write(bytes(inp+'\n','utf-8'))
-        
