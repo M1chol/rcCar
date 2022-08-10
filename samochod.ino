@@ -27,13 +27,13 @@ void loop() {
     String cmd = Serial.readStringUntil(' ');
     
     if(cmd.startsWith("stop")){
-      car.Stop;
+      car.Stop();
     }
     
     else if(cmd.startsWith("move")){
       int spe=Serial.parseInt();
       int acc=Serial.parseInt();
-      car.Move(spe,acce);
+      car.Move(spe,acc);
     }
 
     else if(cmd.startsWith("turn")){
