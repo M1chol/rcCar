@@ -63,7 +63,7 @@ class TextPrint(object):
 def CloseApp():
     ssh.close()
     pygame.quit()
-
+#funkcje pygame
 pygame.init()
 pygame.joystick.init()
 textPrint = TextPrint()
