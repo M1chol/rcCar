@@ -48,5 +48,6 @@ void loop() {
     }
     else if(cmd.startsWith("test")){
       car.Test();
+    }
   }
 }
