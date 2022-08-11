@@ -16,9 +16,10 @@ class Car{
   public:
     //zmienne publiczne
     int pos = 90-serv_err;        // aktualna pozycja serwa
-    int serv_err = 18;            // kat serwa aby kola byly prosto
+    int serv_err = 20;            // kat serwa aby kola byly prosto
     int carSpeed;                 // predkosc pojazdu
-    int startingSpeed=10;         // predkosc minimalna
+    int startingSpeed=15;         // predkosc minimalna
+    int maxSpeed=100;             // predkosc maksalna
   
     void Setup(){
       pinMode(SRW, OUTPUT);
@@ -70,23 +71,25 @@ class Car{
     }
     
     void WriteSpeed(int Speed){
-        Serial.println(Speed);
         if (Speed==0){
           Stop();
         }
+        if (Speed>maxSpeed){return;}
         if (Speed>0){
           analogWrite(R_PWM, Speed);
+          analogWrite(L_PWM, 0);
         }else{
           analogWrite(L_PWM, abs(Speed));
+          analogWrite(R_PWM, 0);
         }
         carSpeed=Speed;
       }
     
     void rapidMove(int toSpeed){
-      if (abs(toSpeed)>startingSpeed){
-        WriteSpeed(toSpeed);
-        carSpeed=toSpeed;
-      }
+      if (abs(toSpeed)<startingSpeed and toSpeed!= 0){return;}
+      WriteSpeed(toSpeed);
+      carSpeed=toSpeed;
+      
     }
     void rapidTurn(int angle){
         serv.write(angle);
