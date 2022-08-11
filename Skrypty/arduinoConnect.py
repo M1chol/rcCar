@@ -1,19 +1,23 @@
 import serial
 port="/dev/ttyUSB0"
-try:
-    sr=serial.Serial(port,9600, timeout=0.5)
-except:
-    print('Blad podczas polaczenia z',port)
-    quit()
-else:
-    print('Polaczono z',port)
+while True:
+    try:
+        sr=serial.Serial(port,9600, timeout=0.5)
+    except:
+        print('Blad podczas polaczenia z',port,'podaj nowy port lub sprawdz polaczenie:')
+        port=input()
+        if 'exit' in port: quit()
+        
+    else:
+        print('Polaczono z',port)
+        break
     
 sr.flush()
-print('Rozpoczynam komunikacje')
 slucham=True
-while slucham!=False:
-    inp=str(input())
+while slucham:
+    inp=str(input('arduinoConnect> '))
     if 'exit' in inp:
         slucham=False
     else:
-        sr.write(bytes(inp+'\n','utf-8'))
+        sr.write(bytes(inp,'utf-8'))
+
