@@ -28,11 +28,11 @@ void loop() {
     if(cmd.startsWith("stop")){
       car.Stop();
     }
-    else if (cmd.startsWith("rMove"){
+    else if (cmd.startsWith("rMove")){
       int spe=Serial.parseInt();
       car.rapidMove(spe);
     }
-    else if (cmd.startsWith("rTurn")
+    else if (cmd.startsWith("rTurn")){
       int ang = Serial.parseInt();
       car.rapidTurn(ang);
     }
