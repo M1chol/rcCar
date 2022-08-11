@@ -13,7 +13,7 @@ print('Rozpoczynam komunikacje')
 slucham=True
 while slucham!=False:
     inp=str(input())
-    if 'stop' in inp:
+    if 'exit' in inp:
         slucham=False
     else:
         sr.write(bytes(inp+'\n','utf-8'))
