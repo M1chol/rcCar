@@ -1,6 +1,5 @@
 # Samochód zdalnie sterowany
 Uwaga projekt nie jest jeszcze skończony!
-Niektóre pliki nie są skończone i nie działają.
 
 Poniżej przedstawie szczegółowy opis budowy prostego samochodu autonomicznego. Części które użyłem znajdują się [tutaj](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md). Oprócz wymienonych elementów przydadzą się kable złączki itd. Do zmontowania całości oczywiście będzie potrzeba lutownica.
 
