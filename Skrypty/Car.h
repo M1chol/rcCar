@@ -84,11 +84,11 @@ class Car{
     
     void rapidMove(int toSpeed){
       if (abs(toSpeed)>startingSpeed){
-        WriteSpeed(toSpeed)
+        WriteSpeed(toSpeed);
         carSpeed=toSpeed;
       }
     }
-    void rapidTurn(int Angle){
+    void rapidTurn(int angle){
         serv.write(angle);
         pos=angle;
     }
