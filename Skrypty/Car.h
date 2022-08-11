@@ -21,7 +21,6 @@ class Car{
     int startingSpeed=10;         // predkosc minimalna
   
     void Setup(){
-      Serial.println("Starting");
       pinMode(SRW, OUTPUT);
       serv.attach(SRW);           // podlaczenie serwa
       pinMode(R_IS, OUTPUT);      // wyjscie alarmu
@@ -83,6 +82,18 @@ class Car{
         carSpeed=Speed;
       }
     
+    void rapidMove(int toSpeed){
+      if (abs(toSpeed)>startingSpeed){
+        WriteSpeed(toSpeed)
+        carSpeed=toSpeed;
+      }
+    }
+    void rapidTurn(int Angle){
+        serv.write(angle);
+        pos=angle;
+    }
+    
+  
     void Move(int toSpeed, int acceleration){
       
       int toDir=toSpeed/abs(toSpeed);      
