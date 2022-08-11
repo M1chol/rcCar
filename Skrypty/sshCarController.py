@@ -119,8 +119,8 @@ while True:
                 textPrint.tprint(screen, "skret wartosc: {}".format(int(skret)))
                 textPrint.tprint(screen, "predkosc wartosc: {}".format(int(predkosc)))
 
-                moveCmd = bytes('move {} {}\n'.format(int(predkosc), carAccel), 'utf-8')
-                turnCmd = bytes('turn {} {}\n'.format(int(skret), 0), 'utf-8')
+                moveCmd = bytes('rMove {}\n'.format(int(predkosc)), 'utf-8')
+                turnCmd = bytes('rTurn {}\n'.format(int(skret)), 'utf-8')
                 print(moveCmd)
                 print(turnCmd)
                 if lastMoveCmd!=moveCmd: channel.send(moveCmd) #wysłanie komendy do arduino
