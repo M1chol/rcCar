@@ -35,12 +35,18 @@ void loop() {
       int acc=Serial.parseInt();
       car.Move(spe,acc);
     }
-
     else if(cmd.startsWith("turn")){
       int ang=Serial.parseInt();
       int spe=Serial.parseInt();
       car.Turn(ang,spe);
     }
+    else if (cmd.startsWith("rMove"){
+      int spe=Serial.parseInt();
+      car.rapidMove(spe);
+    }
+    else if (cmd.startsWith("rTurn")
+      int ang = Serial.parseInt();
+      car.rapidTurn(ang);
+    }
   }
-  
 }
