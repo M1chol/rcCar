@@ -16,3 +16,7 @@ Jako podwozie użyłem zestawu do samodzielnego montażu (patrz plik z częścia
 
 ### Oto prosty schemat zawierający główne komponenty samochodu:
 ![Schematic_rcCar_2022-08-09](https://user-images.githubusercontent.com/106252516/183687655-5ca91baa-e46a-4876-8bab-b56d4de04d62.png)
+
+### Filmy
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm.gif)
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm2.gif)
