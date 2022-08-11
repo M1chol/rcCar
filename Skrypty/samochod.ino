@@ -16,9 +16,8 @@ void diodeBlink(int num){
 //setup
 void setup() {
  Serial.begin(9600);
- while(!Serial){;}
  car.Setup();
- car.Test(); 
+ while(!Serial){;}
 }
 
 //glowna petla
@@ -29,7 +28,14 @@ void loop() {
     if(cmd.startsWith("stop")){
       car.Stop();
     }
-    
+    else if (cmd.startsWith("rMove"){
+      int spe=Serial.parseInt();
+      car.rapidMove(spe);
+    }
+    else if (cmd.startsWith("rTurn")
+      int ang = Serial.parseInt();
+      car.rapidTurn(ang);
+    }
     else if(cmd.startsWith("move")){
       int spe=Serial.parseInt();
       int acc=Serial.parseInt();
@@ -40,13 +46,7 @@ void loop() {
       int spe=Serial.parseInt();
       car.Turn(ang,spe);
     }
-    else if (cmd.startsWith("rMove"){
-      int spe=Serial.parseInt();
-      car.rapidMove(spe);
-    }
-    else if (cmd.startsWith("rTurn")
-      int ang = Serial.parseInt();
-      car.rapidTurn(ang);
-    }
+    else if(cmd.startsWith("test")){
+      car.Test();
   }
 }
