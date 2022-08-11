@@ -15,7 +15,7 @@ przod = 5
 skr = 0
 #zmienne kontrolera
 speed_multipl = 30
-turn_multipl = 40
+turn_multipl = 45
 deadzone = 3
 done = False
 pmr = False
