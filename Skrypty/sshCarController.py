@@ -2,8 +2,8 @@ import paramiko
 import pygame
 import time
 
+#ZMIENNE
 #zmienne samochodu
-carAccel=2
 lastTurnCmd = ''
 lastMoveCmd = ''
 #zmienne wyświetlanie
@@ -20,7 +20,7 @@ deadzone = 3
 done = False
 pmr = False
 clock = pygame.time.Clock()
-#zmienne zdalnego połącznia
+#zmienne zdalnego połącznia (aby ssh działało trzeba je włączyć ustawieniach w rasperry pi)
 target_ip = "192.168.8.199"
 target_username = "pi"
 target_password = "m1chol"
@@ -29,12 +29,10 @@ ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 #stworzenie kanału komunikacji
 try:
-    ssh.connect(target_ip, username=target_username, password=target_password, look_for_keys=False)
+    ssh.connect(target_ip, username=target_username, password=target_password, look_for_keys=False) #połączenie z raspberry
 except:
     print("Błąd podczas połacznia zdalnego")
 channel = ssh.invoke_shell()
-host = str()
-srcfile = str()
 channel_data = bytes()
 driving = False
 
@@ -63,7 +61,7 @@ class TextPrint(object):
 def CloseApp():
     ssh.close()
     pygame.quit()
-#funkcje pygame
+
 pygame.init()
 pygame.joystick.init()
 textPrint = TextPrint()
@@ -72,15 +70,16 @@ pygame.display.set_caption("RcCar")
 
 #pętla komunikacji
 while True:
-    if channel.recv_ready():
-        channel_data += channel.recv(1000)
+    if channel.recv_ready(): #jeżeli są dane do zczytania
+        channel_data += channel.recv(1000) #dodaj tekst z konsoli do channel_data
     else:
-        continue
-    if channel_data.endswith(b'pi@raspberrypi:~$ '):
-        channel.send(b'cd /home/pi/Desktop/Scripts/Arduino/samochod; python3 arduinoConnect.py\n')
+        continue #w innym wypadku czekaj aż pojawią się nowe dane
+    if channel_data.endswith(b'pi@raspberrypi:~$ '): #jeżeli dane kończą się na "pi@raspberrypi:~$ " czyli konsola jest pusta (czeka na input)
+        channel.send(b'cd /home/pi/Desktop/Scripts/Arduino/samochod; python3 arduinoConnect.py\n') #przejdź do lokalizacji skryptu arduinoConnect i go odpal
 
-    elif channel_data.endswith(b'arduinoConnect> '):
+    elif channel_data.endswith(b'arduinoConnect> '): #jeżeli arduinoConnect jest odpalony i czeka na input
         driving = True
+        #główna pętla
         while driving:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -105,13 +104,13 @@ while True:
             joystick.init()
 
             if joystick.get_button(1) == 1:
+                channel.send(b"stop\n")
                 CloseApp()
 
             name = joystick.get_name()
             axes = joystick.get_numaxes()
-            predkosc = ((round(joystick.get_axis(tyl), 1) + 1) * -1 + round(joystick.get_axis(przod),
-                                                                            1) + 1) * speed_multipl
-            skret = (round(joystick.get_axis(skr), 1)) * turn_multipl
+            predkosc = ((round(joystick.get_axis(tyl), 1) + 1) * -1 + round(joystick.get_axis(przod),1) + 1) * speed_multipl
+            skret = (round(joystick.get_axis(skr), 1)) * turn_multipl + 70
             if abs(skret) < deadzone: skret = 0
 
             textPrint.tprint(screen, "Kontroler: {}".format(name))
@@ -119,19 +118,24 @@ while True:
                 textPrint.tprint(screen, "skret wartosc: {}".format(int(skret)))
                 textPrint.tprint(screen, "predkosc wartosc: {}".format(int(predkosc)))
 
+                # przygotowanie komendy do wysłania
                 moveCmd = bytes('rMove {}\n'.format(int(predkosc)), 'utf-8')
                 turnCmd = bytes('rTurn {}\n'.format(int(skret)), 'utf-8')
-                print(moveCmd)
-                print(turnCmd)
-                if lastMoveCmd!=moveCmd: channel.send(moveCmd) #wysłanie komendy do arduino
-                if lastTurnCmd!=turnCmd: channel.send(turnCmd) #wysłanie komendy do arduino
-                lastMoveCmd = moveCmd
+
+                if lastMoveCmd!=moveCmd: #jeżeli komenda różni się od ostatnio wysłanej przślij ją do wykonania
+                    channel.send(moveCmd)
+                    print(moveCmd)
+
+                if lastTurnCmd!=turnCmd: #jeżeli komenda różni się od ostatnio wysłanej przślij ją do wykonania
+                    channel.send(turnCmd)
+                    print(turnCmd)
+
+                lastMoveCmd = moveCmd #przypisanie ostatniej komendy
                 lastTurnCmd = turnCmd
             else:
                 textPrint.tprint(screen, "Aby rozpoczac wysyłanie komend kliknij dowolny przycisk")
 
             pygame.display.flip()
             clock.tick(20)
-    time.sleep(0.1)
 
 CloseApp()
