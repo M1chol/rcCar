@@ -136,6 +136,6 @@ while True:
                 textPrint.tprint(screen, "Aby rozpoczac wysyłanie komend kliknij dowolny przycisk")
 
             pygame.display.flip()
-            clock.tick(20)
+            clock.tick(60)
 
 CloseApp()
