@@ -1,4 +1,4 @@
-# Samochód zdalnie sterowany
+# Autonomiczny samochód zdalnie sterowany
 ```python
 UWAGA PROJEKT NIE JEST JESZCZE ZKONCZONY
 ```
