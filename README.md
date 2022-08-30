@@ -30,7 +30,7 @@ Dzięki takiemu połączeniu zasięg sterowania jest taki jak sieć Wi-Fi, do kt
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm2.gif)
 
 ### Etap 2: wykrywanie lini
-####Simple line detection:
+#### Simple line detection:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm3.gif)
-####Advanced line detection
+#### Advanced line detection
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm5_reduced.gif)
