@@ -16,6 +16,7 @@ Samochód zasilany jest Baterią litowo-polimerową z 3 ogniwami, która po nał
 
 ### Oto prosty schemat zawierający główne komponenty samochodu:
 ![Schematic_rcCar_2022-08-09](https://user-images.githubusercontent.com/106252516/183687655-5ca91baa-e46a-4876-8bab-b56d4de04d62.png)
+<!--DODAĆ ZDJĘCIE KOŃCOWE-->
 
 ---
 
