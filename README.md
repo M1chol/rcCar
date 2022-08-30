@@ -29,8 +29,29 @@ Dzięki takiemu połączeniu zasięg sterowania jest taki jak sieć Wi-Fi, do kt
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm.gif)
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm2.gif)
 
-### Etap 2: wykrywanie lini
-#### Simple line detection:
+### Etap 2: wykrywanie krawędzi
+#### Założenia:
+1. Pasy to białe linie na czarnym tle.
+2. Samochód zostaje ułożony wpoprawnej pozycji startowej; między pasami.
+3. Możliwe ostre zakręty drogi
+
+Pierwszym krokiem do autonomicznej jazdy jest dobre wykrywanie pasów ruchu. Na samochodzie zamontowałem kamerę która podłączona jest do Raspberry. Obraz streamuje na port ip Raspberry przy pomocy aplikacji motion. Następnie na komputerze podłączonym do tej samej sieci działa [program analizujący stream](https://github.com/M1chol/rcCar/blob/main/Skrypty/LineDetectionAdvanced.py).
+
+Poniżej opiszę działanie dwóch algorytmów do wykrywania lini, pierwszy z nich świetnie nadaje się do lokalizacji na prostym (lub lekko skręcającym) kawału pasa. Drugi natomiast wykorzystam do analizy skrętów pod dużym kątem.
+#### Proste wykrywanie krawędzi:
+Oto efekt końcowy prostego algorytmu do wykrywania pasów:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm3.gif)
+W pierwszej kolejności na zdjęciu znajdujemy miejsca w których jest duża zmiana kontrastu przy użyciu filtru [canny](https://pl.wikipedia.org/wiki/Canny). Rezultat to czarne zdjęcie z zaznaczonymi na biało krawędziami pasów. Robimy to aby z analizowango zdjęcia usunąć zbędne informacje. Następnie stosujemy [transformacje Hougha](https://pl.wikipedia.org/wiki/Transformacja_Hougha) czyli algorytm wykrywający linie proste na obrazie. Liste otrzymanych lini dzielimy wedłóg nachylenia: proste o ujemnym wektorze kierunku prawy pas, a o dodatnim lewy. Z podzielonych lini wyciągamy dwie średnie które dokładnie opisują dwa wykryte pasy.
+#### Podsumowanie procesu
+1. Zdjęcie wejściowe
+2. Nałożenie filtru Canny
+3. Wykrycie lini
+4. Podzielenie lini względem nachylenia
+5. Wyciągnięcie średniej
+#### Animacja:
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/lineDetecionProces.gif)
+
+
 #### Advanced line detection
-![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm5_reduced.gif)
+
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm5_copy.gif)
