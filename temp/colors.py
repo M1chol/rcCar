@@ -1,0 +1,7 @@
+RESET = '\033[00m'
+RED = '\033[91m'
+GREEN ='\033[92m'
+YELLOW ='\033[93m'
+BLUE = '\033[94m'
+LAVENDER = '\033[95m'
+TEAL = '\033[96m'
