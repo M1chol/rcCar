@@ -66,6 +66,10 @@ def avarageSlopeIntersect(image, lines): #wyciąganie średniej z lini
 
 def AnalizeForLines(image):
     img_cann=canny(image)  # zastosowanie metody canny
+    # gray=cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # blurred=cv2.GaussianBlur(gray, (7, 7), 0)
+    # (T, thresh)=cv2.threshold(blurred, 150, 255,
+    #                           cv2.THRESH_BINARY)
     img_crop=regionOfIntrest(img_cann, 0)  # przycięcie zdjęcia
     try:
         lines=cv2.HoughLinesP(img_crop, 2, np.pi / 180, 70, None, minLineLength=60, maxLineGap=20)
@@ -139,29 +143,28 @@ def distaceBetweenPoints(starting_line, lines, returnSorted=False, displacement=
         retArr=retArr[sort]
     return retArr
 
-def detectStartingLines(lines, lastLineLeft=None, lastLineRight=None):
-    if lastLineLeft is not None and lastLineRight is not None:
-        return np.array([lastLineLeft,lastLineRight])
+def detectStartingLines(lines):
+    print(f'{WARN}Detecting starting lines...')
+    maxDist=70
+    maxXDisp=30
+    startingPoints=[[266, 460, 0, 0], [381, 460, 0, 0]]
+
+    lineLeftDist=distaceBetweenPoints(startingPoints[0],lines, True)
+    lineRightDist=distaceBetweenPoints(startingPoints[1],lines,True)
+
+    if lineLeftDist[0][0]<maxDist and lineLeftDist[0][1]<maxXDisp:
+        lineLeft=lines[int(lineLeftDist[0][2])]
+        print(f'{OK}Left lane - OK{RESET}')
     else:
-        maxDist=70
-        maxXDisp=30
-        print(f'{WARN}Detecting starting lines...')
-        startingPoints=[[266, 460, 0, 0], [381, 460, 0, 0]]
-        lineLeftDist=distaceBetweenPoints(startingPoints[0], lines, True)
-        lineRightDist=distaceBetweenPoints(startingPoints[1], lines, True)
-        if lineLeftDist[0][0] < maxDist and lineLeftDist[0][1] < maxXDisp:
-            lineLeft=lines[int(lineLeftDist[0][2])]
-            print(f'{OK}Left lane - OK{RESET}')
-        else:
-            print(f'{ERR}Left lane - Out of bounds{RESET}')
-            lineLeft=None
-        if lineRightDist[0][0] < maxDist and lineRightDist[0][1] < maxXDisp:
-            lineRight=lines[int(lineRightDist[0][2])]
-            print(f'{OK}Right lane - OK{RESET}')
-        else:
-            print(f'{ERR}Right lane - Out of bounds{RESET}')
-            lineRight=None
-        return np.array([lineLeft,lineRight])
+        print(f'{ERR}Left lane - Out of bounds{RESET}')
+        lineLeft=None
+    if lineRightDist[0][0]<maxDist and lineRightDist[0][1]<maxXDisp:
+        lineRight=lines[int(lineRightDist[0][2])]
+        print(f'{OK}Right lane - OK{RESET}')
+    else:
+        print(f'{ERR}Right lane - Out of bounds{RESET}')
+        lineRight=None
+    return np.array([lineLeft,lineRight])
 
 def detectBirdLines(line_start, lines, image):
     maxDist=40
@@ -173,47 +176,6 @@ def detectBirdLines(line_start, lines, image):
         if linesSorted[0][0] < maxDist:
             detectedLines[lineNr].append(lines[int(linesSorted[0][2])])
     return detectedLines
-
-
-def calculatePerpendVector(line):
-    x1,y1,x2,y2 = line.reshape(4)
-    vector=[x2-x1,y2-y1]
-    perpVector=np.empty_like(vector)
-    perpVector[0]=-vector[1]
-    perpVector[1]=vector[0]
-    return perpVector/np.linalg.norm(perpVector)
-
-def shiftLinesOnPerpendVector(line, road_width, kier=1):
-    vx, vy=calculatePerpendVector(line) * (road_width / 2)
-    vx, vy=round(vx)*kier, round(vy)*kier
-    line=[line[0] + vx, line[1] + vy,
-                         line[2] + vx, line[3] + vy] # przesuniecie po wektorze prostopadlym w prawo
-    return line
-
-def centerLines(startingLines, lines, image):
-    center_lines=[]
-    road_width=100
-    if startingLines[0] is not None and startingLines[1] is not None:
-        road_width=abs(startingLines[0][0] - startingLines[1][0])
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[0], road_width, 1))
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[1], road_width, -1))
-    elif startingLines[0] is None and startingLines[1] is None:
-        return [None, None]
-    elif startingLines[0] is None:
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[1], road_width, -1))
-    else:
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[0], road_width, 1))
-
-    for kier in range(2):
-        for line in lines[kier]:
-            if kier==0:
-                center_lines.append(shiftLinesOnPerpendVector(line, road_width, 1))
-            elif kier==1:
-                center_lines.append(shiftLinesOnPerpendVector(line, road_width, -1))
-
-    center_lines.append([image.shape[1]//2,image.shape[0], image.shape[1]//2,center_lines[0][1]])
-
-    return np.array(center_lines)
 
 def analizeBirdView(image):
     img_warped=perspectiveWarp(image)
@@ -230,23 +192,16 @@ def analizeBirdView(image):
         lines=lines[ind_log]
     print(f'{WARN}Detecting next lines...{RESET}')
     detected_lines=detectBirdLines(detected_starting_lines, lines, image)
-    print(f'Found {len(detected_lines)} lines')
-    center_line=centerLines(detected_starting_lines,detected_lines, image)
-
-    #wyświetlanie lini na obrazie
+    print(f'Using {len(detected_lines)} lines')
     img_statingLinesLeft=displayLine(image, detected_starting_lines[0],(0,255,0),(0,225,0), list=False)
     img_statingLinesRight=displayLine(image, detected_starting_lines[1], list=False)
     img_detectedLeftLines=displayLine(image, detected_lines[0], (0,255,0),(0,225,0))
     img_detectedRightLines=displayLine(image, detected_lines[1])
-    img_centerLines=displayLine(image, center_line,(255,0,0),(255,0,0))
-
-    #łączenie uzyskanych obrazów w jedno
     img_comb=cv2.addWeighted(img_warped, 0.6, img_statingLinesLeft,1,1,1)
     img_comb2=cv2.addWeighted(img_comb, 1, img_statingLinesRight,1,1,1)
     img_comb3=cv2.addWeighted(img_comb2, 1, img_detectedLeftLines, 1, 1, 1)
     img_comb4=cv2.addWeighted(img_comb3, 1, img_detectedRightLines, 1, 1, 1)
-    img_comb5=cv2.addWeighted(img_comb4, 1, img_centerLines, 1, 1, 1)
-    return img_comb5, img_crop
+    return img_comb4, img_crop
 
 
 img = cv2.imread('../testImg/test3.3.png')
@@ -257,6 +212,8 @@ cv2.imshow("Final image",i1)
 i3, i4 = analizeBirdView(img)
 cv2.imshow("warped",i3)
 cv2.imshow("warped_canny",i4)
-plik = open('../testImg/lines.txt')
+plik = open('img/lines.txt')
 plt.show()
 cv2.waitKey(0)
+
+

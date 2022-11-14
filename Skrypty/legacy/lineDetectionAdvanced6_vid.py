@@ -190,7 +190,7 @@ def analizeBirdView(image):
     img_statingLinesRight=displayLine(image, detected_starting_lines[1], list=False)
     img_detectedLeftLines=displayLine(image, detected_lines[0], (0,255,0),(0,225,0))
     img_detectedRightLines=displayLine(image, detected_lines[1])
-    img_comb=cv2.addWeighted(img_warped, 1, img_statingLinesLeft,1,1,1)
+    img_comb=cv2.addWeighted(img_warped, .8, img_statingLinesLeft,1,1,1)
     img_comb2=cv2.addWeighted(img_comb, 1, img_statingLinesRight,1,1,1)
     img_comb3=cv2.addWeighted(img_comb2, 1, img_detectedLeftLines, 1, 1, 1)
     img_comb4=cv2.addWeighted(img_comb3, 1, img_detectedRightLines, 1, 1, 1)

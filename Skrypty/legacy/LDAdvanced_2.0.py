@@ -1,6 +1,3 @@
-# THIS IS OLD FILE #
-# FOR NEW VISIT GITHUB/M1CHOL #
-
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -156,14 +153,14 @@ def AnalizeForCurve(image):
     except:
         return image, img_crop
 
-img = cv2.imread('../testImg/test2.4.png')
+img = cv2.imread('../testImg/test3.3.png')
 i1, i2 = AnalizeForLines(img)
 cv2.imshow("normal",i1)
 cv2.imshow("normal_canny",i2)
 i3, i4 = AnalizeForCurve(img)
 cv2.imshow("warped",i3)
 cv2.imshow("warped_canny",i4)
-plik = open('../testImg/lines.txt')
+plik = open('img/lines.txt')
 np.savetxt('../testImg/lines.txt',i4,delimiter=',',newline='\n')
 cv2.waitKey(0)
 
