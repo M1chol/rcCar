@@ -1,9 +1,6 @@
-import cv2
 import numpy as np
-OK ='\033[92m'
-WARN ='\033[93m'
-ERR = '\033[91m'
-RESET = '\033[00m'
+from cmath import rect, phase
+from math import radians, degrees
 
 def calculatePerpendVector(line): # funkcja obliczjąca znormalizowany wektor prostopadły
     x1,y1,x2,y2 = line.reshape(4)
@@ -59,81 +56,33 @@ def distaceBetweenPoints(starting_line, lines, returnSorted=False, displacement=
         retArr=retArr[sort]
     return retArr
 
-def detectStartingLines(lines,):                          # TODO napisac leprszy algorytm wykrywania lini poczatkowych
-    """
-    :param lines: wszystkie linie
-    :return: wykryte linie poczatkowe (najblizsze do dolu przeszukiwanego obszaru)
-    """
-    maxDist=70
-    maxXDisp=30
-    print(f'{WARN}Detecting starting lines...')
-    startingPoints=[[266, 460, 0, 0], [381, 460, 0, 0]]
-    lineLeftDist=distaceBetweenPoints(startingPoints[0], lines, True)
-    lineRightDist=distaceBetweenPoints(startingPoints[1], lines, True)
-    if lineLeftDist[0][0] < maxDist and lineLeftDist[0][1] < maxXDisp:
-        lineLeft=lines[int(lineLeftDist[0][2])]
-        print(f'{OK}Left lane - OK{RESET}')
-    else:
-        print(f'{ERR}Left lane - Out of bounds{RESET}')
-        lineLeft=None
-    if lineRightDist[0][0] < maxDist and lineRightDist[0][1] < maxXDisp:
-        lineRight=lines[int(lineRightDist[0][2])]
-        print(f'{OK}Right lane - OK{RESET}')
-    else:
-        print(f'{ERR}Right lane - Out of bounds{RESET}')
-        lineRight=None
-    return [lineLeft,lineRight] # [ignore] np.array([lineLeft,lineRight])
+# def deleteElements(table, linesToDel):
+#     """
+#     :param table: tabela lini z ktorych chcemy usunac wartosc
+#     :param linesToDel: konkretna linia lub tablica lini do usuniecia
+#     :return: tablica poczatkowa bez zadanych lini
+#     """
+#     if type(linesToDel[0]) is not np.intc:
+#         for i in linesToDel:
+#             table = table[np.where(4 == np.sum(table == i, axis=1), False, True)]
+#     else:
+#         table=table[np.where(4 == np.sum(table == linesToDel, axis=1), False, True)]
+#     return table
+#
+#
+# def nextLine(starting_line, lines, maxDist, detectedLines):
+#     all_lines=lines
+#     closestLine=distaceBetweenPoints(starting_line, all_lines, True, displacement=True)[0]              # wykrycie najblizszej lini
+#     if closestLine[0] <= maxDist:                                                                       # sprawdzenie odleglosci
+#         chosenLine=lines[int(closestLine[2])]                                                           # przypisanie lini
+#         detectedLines.append(chosenLine)                                                                # dodanie lini do tablicy koncowej
+#         all_lines = deleteElements(all_lines, chosenLine)                                               # usuniecie znalezionej lini z listy wszystkich lini
+#         return nextLine(chosenLine, all_lines, maxDist, detectedLines)
+#     else: return detectedLines
 
-def deleteElements(table, linesToDel):
-    """
-    :param table: tabela lini z ktorych chcemy usunac wartosc
-    :param linesToDel: konkretna linia lub tablica lini do usuniecia
-    :return: tablica poczatkowa bez zadanych lini
-    """
-    if type(linesToDel[0]) is not np.intc:
-        for i in linesToDel:
-            table = table[np.where(4 == np.sum(table == i, axis=1), False, True)]
-    else:
-        table=table[np.where(4 == np.sum(table == linesToDel, axis=1), False, True)]
-    return table
-
-
-def nextLine(starting_line, lines, maxDist, detectedLines):
-    all_lines=lines
-    closestLine=distaceBetweenPoints(starting_line, all_lines, True, displacement=True)[0]              # wykrycie najblizszej lini
-    if closestLine[0] <= maxDist:                                                                       # sprawdzenie odleglosci
-        chosenLine=lines[int(closestLine[2])]                                                           # przypisanie lini
-        detectedLines.append(chosenLine)                                                                # dodanie lini do tablicy koncowej
-        all_lines = deleteElements(all_lines, chosenLine)                                               # usuniecie znalezionej lini z listy wszystkich lini
-        return nextLine(chosenLine, all_lines, maxDist, detectedLines)
-    else: return detectedLines
-
-def detectBirdLines(line_start, lines):
-    print(f'{WARN}Detecting lines...{RESET}')
-    maxDist=40
-    detectedLines=[]
-    for line in line_start:
-        if line is None:
-            detectedLines.append([])
-            continue
-        detectedLines.append(nextLine(line, lines, maxDist,[]))
-    print(f'Found {len(detectedLines[0])+len(detectedLines[1])} lines')
-    return detectedLines
-
-def centerLines(startingLines, lines, image):
+def centerLines(lines, image, maxDist=80, road_width=100):
     center_lines=[]
-    road_width=100
-    if startingLines[0] is not None and startingLines[1] is not None:
-        road_width=abs(startingLines[0][0] - startingLines[1][0])
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[0], road_width, 1))
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[1], road_width, -1))
-    elif startingLines[0] is None and startingLines[1] is None:
-        return [None, None]
-    elif startingLines[0] is None:
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[1], road_width, -1))
-    else:
-        center_lines.append(shiftLinesOnPerpendVector(startingLines[0], road_width, 1))
-
+    height = image.shape[0]
     for kier in range(2):
         for line in lines[kier]:
             if kier==0:
@@ -141,6 +90,56 @@ def centerLines(startingLines, lines, image):
             elif kier==1:
                 center_lines.append(shiftLinesOnPerpendVector(line, road_width, -1))
 
-    center_lines.append([image.shape[1]//2,image.shape[0], image.shape[1]//2,center_lines[0][1]])
+    if len(center_lines) != 0:
+        if center_lines[0][1] < height - 5:
+            center_lines.append([image.shape[1]//2,image.shape[0], image.shape[1]//2, center_lines[0][1]])
+    else:
+        center_lines.append([image.shape[1] // 2, image.shape[0], image.shape[1] // 2, height-maxDist])
 
     return np.array(center_lines)
+
+def detectBirdLines(line_start, lines, maxDist=40, numberOfLines=0):
+    """
+    :param line_start: linia od ktorej szukamy
+    :param lines: wszystkie linie
+    :param maxDist: maksymalna odleglosc lini
+    :param numberOfLines: ilosc krokow, jezeli 0 - do ostatniej wykrytej
+    :return: tablica lini w jednym pasie
+    """
+    detectedLines=[]
+    krok=0
+    while True if numberOfLines==0 else krok<numberOfLines:
+        closestLineslist=distaceBetweenPoints(line_start, lines, True, displacement=True)
+        closestLine=closestLineslist[0] # przypisanie lini najbliższej
+        if closestLine[0] <= maxDist:  # sprawdzenie odleglosci
+            chosenLine=lines[int(closestLine[2])]  # przypisanie lini
+            detectedLines.append(chosenLine)
+            line_start=chosenLine
+        else:
+            return detectedLines
+        krok+=1
+        lines=np.delete(lines, int(closestLineslist[0][2]), 0)  # usuniecie lini analizowanej z tablicy wszyst. lini
+    return detectedLines
+
+
+def makeCoords(image, angle, maxDist):
+    if angle<0: angle+=180
+    y1 = image.shape[0]
+    x1 = int(image.shape[1]//2)
+    y2= int(y1 - maxDist*np.sin(radians(angle)))
+    x2= int(x1 - maxDist*np.cos(radians(angle)))
+    return [x1,y1,x2,y2]
+
+def mean_angle(deg):                                                            # średnia wartość kątów
+    return degrees(phase(sum(rect(1, radians(d)) for d in deg)/len(deg)))       # https://rosettacode.org/wiki/Averages/Mean_angle
+
+def avarageSlope(image, lines, visualDist):                               # wyciąganie średniej z lini
+    if not lines: return [int(image.shape[1]//2),image.shape[0],int(image.shape[1]//2),image.shape[0]-visualDist], 90
+    avrLine=[]
+    for line in lines:
+        x1, y1, x2, y2 = line.reshape(4)
+        angle = np.rad2deg(np.arctan2(y2 - y1, x2 - x1))                        # https://stackoverflow.com/questions/35825421/calculate-angle-degrees-in-python-between-line-with-slope-x-and-horizontal
+        avrLine.append(angle)                                                   # dodaj nachylenie do tablicy
+    slopeAvarage = mean_angle(avrLine)                                          # średnia z kątów tablicy
+    newAvrLine = makeCoords(image, slopeAvarage, maxDist=visualDist)               # koordynaty lini
+    return np.array(newAvrLine), slopeAvarage
