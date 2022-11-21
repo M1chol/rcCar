@@ -115,8 +115,12 @@ def detectBirdLines(line_start, lines, maxDist=40, numberOfLines=0):
         lines=np.delete(lines, int(closestLineslist[0][2]), 0)          # usuń analizowaną linie z tablicy wszyst. lini
     return detectedLines                                              # zwróć tablice z wykrytymi liniami
 ```
-  
+### Dodatkowe materiały:
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/car2-2.gif)
+
 ---
   
 ## 3. W przyszłości
 1. Poprawienie problemu z wykrywaniem początkowego pasa -> zapisywanie ostatniej lokalizacji wykrytych lini i odwoływanie się do nich w kolejnych krokach
+2. Stabilny zwrot kątu do skrętu
+3. Autonomiczna jazda i PID
