@@ -8,7 +8,10 @@ Poniżej przedstawię szczegółowy opis budowy prostego samochodu autonomiczneg
 
 ## 1. Zmontowanie samochodu
 Jako podwozie użyłem zestawu do samodzielnego montażu (patrz plik z częściami). Ponieważ instrukcja dołączona w zestawie jest bardzo skromna, zmodyfikowaną dokładniejszą wersję znajdziesz [tutaj](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy) (Instrukcja1.png i Instrukcja2.png).
-
+  
+**Zamierzony efekt końcowy**
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/IMG_20220930_195806.jpg)
+  
 ### Parę zdjęć z montażu:
 ![IMG_20220727_143825](https://user-images.githubusercontent.com/106252516/184039809-f9397042-ed86-4d5f-9c24-03a827240d34.png)
 
@@ -16,25 +19,32 @@ Samochód zasilany jest Baterią litowo-polimerową z 3 ogniwami, która po nał
 
 ### Oto prosty schemat zawierający główne komponenty samochodu:
 ![Schematic_rcCar_2022-08-09](https://user-images.githubusercontent.com/106252516/183687655-5ca91baa-e46a-4876-8bab-b56d4de04d62.png)
-<!--DODAĆ ZDJĘCIE KOŃCOWE-->
+  
+### WAŻNA INFORMACJA!
+W moim projekcie pominąłem dwie istotnie rzeczy więc jeżeli planujesz zbudować podobny samochód koniecznie zmodyfikuj schemat:
+1. BMS (Battery Menegment System) - Istotny punkt jeżeli używasz bateri wielo ogniwowych. W moim samochodzie po dłuższym czasie jedno ogniwo ma wyraźnie niższe napięcie od pozostałych. BMS ze stabilizatorem napięć rozwiąże ten problem
+2. Bezpiecznik - Początkowo miałem w planach dodanie bezpiecznika na dodatnim terminalu baterii. Jest to dobre dodatkowe zabezpieczenie przed przypadkowym zwarciem a więc niekontrolowanym i nagłum utlenianiem litu z polimerem :)
 
 ---
 
 ## 2. Programowanie
 ### Etap 1: zdalne sterowanie
-Na początku zrobiłem zdalne sterowanie przy pomocy kontrolera Xbox. Kontroler jest podłączony do komputera stacjonarnego, na którym sshCarController.py przechwytuje wciskane przyciski przy pomocy biblioteki pygame oraz wysyła input do raspberry pi po SSH (biblioteka paramiko). Konkretnie aplikacja na komputerze uruchamia wcześniej przygotowany program na Raspberry tj. arduinoConnect.py i wysyła jej określone komendy. arduinoConnect.py przekazuje je następnie do Arduino po porcie seryjnym (niżej łatwiejszy sposób).
+Na początku zrobiłem zdalne sterowanie przy pomocy kontrolera Xbox. Kontroler jest podłączony do komputera stacjonarnego, na którym sshCarController.py przechwytuje wciskane przyciski (biblioteka pygame) i wysyła je do raspberry pi po SSH (biblioteka paramiko). RPi po porcie seryjnym wysyła komendy do Arduino które wykonuje polecenia (niżej łatwiejszy sposób).
+  
 ### Diagram połączenia wykorzystującego SSH:
 ![IMG](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy/ScriptsDiagram1.jpg)
-
-Dzięki takiemu połączeniu zasięg sterowania jest taki jak sieć Wi-Fi, do której jesteśmy podłączeni. Minusem natomiast jest większe opóźnienie. Aby je (prawie) całkowicie zniwelować kontroler połączyłem bezpośrednio do Raspberry.
-
+  
+Dzięki takiemu połączeniu zasięg sterowania jest taki jak sieć Wi-Fi, do której jesteśmy podłączeni. Minusem natomiast jest większe opóźnienie. Prostszym sposobem jest pominięcie w całości komputer stacjonarny; kontroler połączyłem bezpośrednio do Raspberry.
+  
 ### Diagram połączenia bezpośredniego:
 ![IMG](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy/ScriptsDiagram2.jpg)
-
+  
 #### Efekt końcowy etapu pierwszego
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm.gif)
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm2.gif)
-
+   
+---
+   
 ### Etap 2: wykrywanie krawędzi
 ### Założenia:
 1. Pasy to białe linie na czarnym tle.
@@ -57,6 +67,54 @@ W pierwszej kolejności na zdjęciu znajdujemy miejsca, w których jest duża zm
 ### Animacja:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/lineDetecionProces.gif)
 
-#### Advanced line detection
-
+### Zaawansowane wykrywanie pasów:
+**Zamierzony efekt końcowy:**  
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/car.gif)  
+  
+Na początku rozciągamy obraz orginalny tak aby usunąć perspektywe i osiągnąc widok z lotu ptaka. Następnie poobnie jak we wcześniejszym punkcie filtrujemy rozciągnięty obraz przy pomocy filtru canny i wyszukujemy na nim linie. Aby pozbyć się lini które zostały wykryte błędnie i odseparować poszczególne pasy w miejscu w którym spodziewamy się zaobserwować początek lewego pasa wyszukujemy najbliższeą wykrytą linie. W kolejnym kroku sprawdzamy czy jej odległość od spodziewanego punktu jest w zadanym przedziale. Tak samo postępujemy z pasem prawym.  
+  
+**Efekt na filmie**  
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm5_copy.gif)
+   
+Jak możesz zobaczyć na powyższej animacji, kolejnym krokiem po znalezieniu początku pasa jest znalezienie najbliższej mu lini licząc od jego końca. Ten algorytm stosujemy w pętli. Należy pamiętać o zmienianu lini od której mierzymy odległość, oraz o usuwaniu wcześniej analizowanych lini ze zbioru wszystkich lini.  
+   
+**Animacja algorytmu**  
+![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/linedetect.gif)  
+   
+**Fragment kodu**   
+Niżej zamieszczam fragmenty kodu z dodatkowymi komentarzami odpowiedzialne za opisany algorytm 
+
+Fragment odpowiedzialny za wywołanie funkcji:
+> lineDetection.py
+```python
+import lineDetectionHandleLines as Lines      # odwołanie do pliku z algorytmem
+startingPoints=[[246, 460, 246, 450], [411, 460, 411, 450]]     # zadanie linie od których zaczynamy poszukiwanie pierwszych pasów
+left_line = Lines.detectBirdLines(startingPoints[0], lines, 55, numberOfLines=numberOfSteps)      # wywołanie funkcji
+```  
+ 
+Zasadnicza funkcja:
+> lineDetecionHandleLines.py
+```python
+def detectBirdLines(line_start, lines, maxDist=40, numberOfLines=0):
+    """
+    :param line_start: linia od ktorej szukamy
+    :param lines: wszystkie linie
+    :param maxDist: maksymalna odleglosc lini
+    :param numberOfLines: ilosc krokow, jezeli 0 - do ostatniej wykrytej
+    :return: tablica lini w jednym pasie
+    """
+    detectedLines=[]                                                                          # zapisuje znalezione linie
+    krok=0                                                                                    # dodaje możliwość zadania maksymalnej liczby kroków 
+    while True if numberOfLines==0 else krok<numberOfLines:                                   # jeżeli zadana liczba kroków to 0 ignoruj licznik, w przeciwnym raze ogranicz liczbę pętli
+        closestLineslist=distaceBetweenPoints(line_start, lines, True, displacement=True)     # zwróć dla każdej lini [odleglosc, przesuniecie na x, indeks (jeżeli sortowanie)]
+        closestLine=closestLineslist[0]                                 # przypisz najbliższą linie do zmiennej
+        if closestLine[0] <= maxDist:                                   # jeżeli odl mniejsza niż maksymalna
+            chosenLine=lines[int(closestLine[2])]                           # zapisz linie (odwołanie do prawdziwej lini nie tablicy z odleglosciami)
+            detectedLines.append(chosenLine)                                # dodaj znalezioną linie do tablicy
+            line_start=chosenLine                                           # nadpisz linie od której szukamy
+        else:                                                           # jeżeli odl większa nisz maksymalna
+            return detectedLines                                            # zwróć tablice z wykrytymi liniami
+        krok+=1                                                         # zwiększ licznik
+        lines=np.delete(lines, int(closestLineslist[0][2]), 0)          # usuń analizowaną linie z tablicy wszyst. lini
+    return detectedLines                                              # zwróć tablice z wykrytymi liniami
+```
