@@ -1,7 +1,4 @@
 # Autonomiczny samochód zdalnie sterowany
-```python
-UWAGA PROJEKT NIE JEST JESZCZE ZKONCZONY
-```
 Poniżej przedstawię szczegółowy opis budowy prostego samochodu autonomicznego. Części, które użyłem znajdują się [tutaj](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md). Oprócz wymienionych elementów przydadzą się kable złączki itd. Do zmontowania całości oczywiście będzie potrzeba lutownica. W folderze skrypty znajdują się wszystkie napisane przeze mnie programy potrzebne do odpalenia samochodu. W razie dodatkowych pytań proszę o kontakt.
 
 ---
@@ -118,3 +115,8 @@ def detectBirdLines(line_start, lines, maxDist=40, numberOfLines=0):
         lines=np.delete(lines, int(closestLineslist[0][2]), 0)          # usuń analizowaną linie z tablicy wszyst. lini
     return detectedLines                                              # zwróć tablice z wykrytymi liniami
 ```
+  
+---
+  
+## 3. W przyszłości
+1. Poprawienie problemu z wykrywaniem początkowego pasa -> zapisywanie ostatniej lokalizacji wykrytych lini i odwoływanie się do nich w kolejnych krokach
