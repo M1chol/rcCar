@@ -1,126 +1,126 @@
-# Autonomiczny samochód zdalnie sterowany
-Poniżej przedstawię szczegółowy opis budowy prostego samochodu autonomicznego. Części, które użyłem znajdują się [tutaj](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md). Oprócz wymienionych elementów przydadzą się kable złączki itd. Do zmontowania całości oczywiście będzie potrzeba lutownica. W folderze skrypty znajdują się wszystkie napisane przeze mnie programy potrzebne do odpalenia samochodu. W razie dodatkowych pytań proszę o kontakt.
+# Remotely controlled autonomous car
+I will present a detailed description of building a simple autonomous car below. The parts I used are found [here](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md). In addition to the listed components, cables and connectors will also be needed. Of course, a soldering iron will be required to assemble the whole thing. The scripts folder contains all the programs I wrote to get the car running. Please feel free to contact me if you have any additional questions.
 
----
+This file is a translation from original Polish version (now README_PL.md), I am sorry for any translation errors and inaccuracies.
 
-## 1. Zmontowanie samochodu
-Jako podwozie użyłem zestawu do samodzielnego montażu (patrz plik z częściami). Ponieważ instrukcja dołączona w zestawie jest bardzo skromna, zmodyfikowaną dokładniejszą wersję znajdziesz [tutaj](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy) (Instrukcja1.png i Instrukcja2.png).
-  
-**Zamierzony efekt końcowy**
+## 1. Assembling the car
+I used a self-assembly kit for the chassis (see the parts file). Since the instruction included in the kit is very basic, you will find a modified, more detailed version [here](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy) (Instrukcja1.png and Instrukcja2.png).   
+   
+**Intended end result**
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/IMG_20220930_195806.jpg)
   
-### Parę zdjęć z montażu:
+### A few assembly photos:
 ![IMG_20220727_143825](https://user-images.githubusercontent.com/106252516/184039809-f9397042-ed86-4d5f-9c24-03a827240d34.png)
 
-Samochód zasilany jest Baterią litowo-polimerową z 3 ogniwami, która po naładowaniu daje napięcie ok. 12V. Aby zasilić Arduino, Raspberry Pi oraz serwo, które przyjmują 5V wykorzystałem przetwornice step-down. W moim przypadku DFR0205, ale tańsze zamienniki również będą dobre. Jako sterownik silnika zastosowałem tani moduł wysokonapięciowy BTS7960D.
+The car is powered by a Lithium Polymer battery with 3 cells, which gives a voltage of about 12V after charging. To power the Arduino, Raspberry Pi, and servo, which take 5V, I used a step-down converter. In my case, it was the DFR0205, but cheaper alternatives will also be good. I used a cheap high voltage motor controller module, the BTS7960D, as the motor controller.
 
-### Oto prosty schemat zawierający główne komponenty samochodu:
+### Here is a simple diagram showing the main components of the car:
 ![Schematic_rcCar_2022-08-09](https://user-images.githubusercontent.com/106252516/183687655-5ca91baa-e46a-4876-8bab-b56d4de04d62.png)
   
-### WAŻNA INFORMACJA!
-W moim projekcie pominąłem dwie istotnie rzeczy więc jeżeli planujesz zbudować podobny samochód koniecznie zmodyfikuj schemat:
-1. BMS (Battery Menegment System) - Istotny punkt jeżeli używasz bateri wielo ogniwowych. W moim samochodzie po dłuższym czasie jedno ogniwo ma wyraźnie niższe napięcie od pozostałych. BMS ze stabilizatorem napięć rozwiąże ten problem
-2. Bezpiecznik - Początkowo miałem w planach dodanie bezpiecznika na dodatnim terminalu baterii. Jest to dobre dodatkowe zabezpieczenie przed przypadkowym zwarciem a więc niekontrolowanym i nagłum utlenianiem litu z polimerem :)
+### IMPORTANT INFORMATION!
+In my project, I omitted two important things, so if you're planning to build a similar car, be sure to modify the schematic:
 
+1. BMS (Battery Management System) - An important point if you're using multi-cell batteries. In my car, after a longer time, one cell has a clearly lower voltage than the others. The BMS with voltage stabilizer will solve this problem.
+2. Fuse - Initially, I had plans to add a fuse on the positive battery terminal. This is a good additional protection against accidental short-circuit and uncontrolled and sudden lithium polymer oxidation :)
 ---
 
-## 2. Programowanie
-### Etap 1: zdalne sterowanie
-Na początku zrobiłem zdalne sterowanie przy pomocy kontrolera Xbox. Kontroler jest podłączony do komputera stacjonarnego, na którym sshCarController.py przechwytuje wciskane przyciski (biblioteka pygame) i wysyła je do raspberry pi po SSH (biblioteka paramiko). RPi po porcie seryjnym wysyła komendy do Arduino które wykonuje polecenia (niżej łatwiejszy sposób).
-  
-### Diagram połączenia wykorzystującego SSH:
+##  2: Programming
+### Step 1: Remote Control
+At the beginning, I made remote control using an Xbox controller. The controller is connected to a desktop computer where the sshCarController.py captures the pressed buttons (pygame library) and sends them to the Raspberry Pi over SSH (paramiko library). The RPi sends commands to Arduino over the serial port, which performs the commands (below is an easier way).
+### Diagram of the connection using SSH:
 ![IMG](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy/ScriptsDiagram1.jpg)
   
-Dzięki takiemu połączeniu zasięg sterowania jest taki jak sieć Wi-Fi, do której jesteśmy podłączeni. Minusem natomiast jest większe opóźnienie. Prostszym sposobem jest pominięcie w całości komputer stacjonarny; kontroler połączyłem bezpośrednio do Raspberry.
+Thanks to this connection, the control range is as far as the Wi-Fi network we are connected to. On the downside, there is a greater delay. A simpler way is to completely omit the desktop computer; I connected the controller directly to the Raspberry Pi.
   
-### Diagram połączenia bezpośredniego:
+### Diagram of direct connection:
 ![IMG](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Schematy/ScriptsDiagram2.jpg)
   
-#### Efekt końcowy etapu pierwszego
+#### The final result of stage one:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm.gif)
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm2.gif)
    
 ---
    
-### Etap 2: wykrywanie krawędzi
-### Założenia:
-1. Pasy to białe linie na czarnym tle.
-2. Samochód zostaje ułożony w poprawnej pozycji startowej; między pasami.
-3. Możliwe ostre zakręty drogi
+### Step 2: Edge Detection
+### Assumptions:
+1. The lanes are white lines on a black background.
+2. The car is positioned correctly in the starting position; between the lanes.
+3. Sharp road turns are possible.
 
-Pierwszym krokiem do autonomicznej jazdy jest dobre wykrywanie pasów ruchu. Na samochodzie zamontowałem kamerę, która podłączona jest do Raspberry. Obraz streamuje na port ip Raspberry przy pomocy aplikacji motion. Następnie na komputerze podłączonym do tej samej sieci działa [program analizujący stream](https://github.com/M1chol/rcCar/blob/main/Skrypty/LineDetectionAdvanced.py).
+The first step towards autonomous driving is good road lane detection. I mounted a camera on the car that is connected to the Raspberry Pi. The image streams to the Raspberry Pi's IP port using the Motion application. Then, on a computer connected to the same network, a [stream analyzing program is running](https://github.com/M1chol/rcCar/blob/main/Skrypty/LineDetectionAdvanced.py).
 
-Poniżej opiszę działanie dwóch algorytmów do wykrywania linii, pierwszy z nich świetnie nadaje się do lokalizacji na prostym (lub lekko skręcającym) kawału pasa. Drugi natomiast wykorzystam do analizy skrętów pod dużym kątem.
-### Proste wykrywanie krawędzi:
-**Zamierzony efekt końcowy**
+Below I will describe the operation of two algorithms for line detection, the first of which is great for locating on a straight (or slightly twisting) piece of lane. The second, on the other hand, I will use for analyzing turns at high angles.
+### Simple edge detection:
+**The intended end result**.
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm3.gif)
-W pierwszej kolejności na zdjęciu znajdujemy miejsca, w których jest duża zmiana kontrastu przy użyciu filtru [canny](https://pl.wikipedia.org/wiki/Canny). Rezultat to czarne zdjęcie z zaznaczonymi na biało krawędziami pasów. Robimy to aby z analizowango zdjęcia usunąć zbędne informacje. Następnie stosujemy [transformacje Hougha](https://pl.wikipedia.org/wiki/Transformacja_Hougha), czyli algorytm wykrywający linie proste na obrazie. Liste otrzymanych linii dzielimy według nachylenia: proste o ujemnym wektorze kierunku prawy pas, a o dodatnim lewy. Z podzielonych linii wyciągamy dwie średnie, które dokładnie opisują dwa wykryte pasy.
-### Podsumowanie procesu
-1. Zdjęcie wejściowe
-2. Nałożenie filtru Canny
-3. Wykrycie linii
-4. Podzielenie linii względem nachylenia
-5. Wyciągnięcie średniej
-### Animacja:
+First of all, we find places in the photo where there is a big change in contrast using the [canny](https://pl.wikipedia.org/wiki/Canny) filter. The result is a black photo with the edges of the stripes highlighted in white. We do this to remove unnecessary information from the analyzed photo. Then we apply [Hough transforms](https://pl.wikipedia.org/wiki/Transformacja_Hougha), an algorithm that detects straight lines in the image. We divide the list of obtained lines according to the slope: straight lines with a negative direction vector the right lane, and those with a positive direction vector the left lane. From the divided lines, we extract two averages that accurately describe the two detected lanes.
+### Summary of the process
+1. input photo
+2. Canny filter
+3. line detection
+4. dividing the lines relative to the slope
+5. extraction of the average
+### Animation:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/lineDetecionProces.gif)
 
-### Zaawansowane wykrywanie pasów:
-**Zamierzony efekt końcowy:**  
+### Advanced line detection:
+**The intended end result:**  
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/car.gif)  
   
-Na początku rozciągamy obraz orginalny tak aby usunąć perspektywe i osiągnąc widok z lotu ptaka. Następnie poobnie jak we wcześniejszym punkcie filtrujemy rozciągnięty obraz przy pomocy filtru canny i wyszukujemy na nim linie. Aby pozbyć się lini które zostały wykryte błędnie i odseparować poszczególne pasy w miejscu w którym spodziewamy się zaobserwować początek lewego pasa wyszukujemy najbliższeą wykrytą linie. W kolejnym kroku sprawdzamy czy jej odległość od spodziewanego punktu jest w zadanym przedziale. Tak samo postępujemy z pasem prawym.  
+First, we stretch the original image so as to remove perspective and achieve a bird's eye view. Then, as in the previous point, we filter the stretched image with the canny filter and search for lines on it. In order to get rid of the lines that were detected incorrectly and separate the individual lanes in the place where we expect to observe the beginning of the left lane, we search for the nearest detected line. In the next step we check if its distance from the expected point is within the specified range. We do the same with the right lane.  
   
-**Efekt na filmie**  
+**Effect on video**  
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/DrivingTestAinm5_copy.gif)
    
-Jak możesz zobaczyć na powyższej animacji, kolejnym krokiem po znalezieniu początku pasa jest znalezienie najbliższej mu lini licząc od jego końca. Ten algorytm stosujemy w pętli. Należy pamiętać o zmienianu lini od której mierzymy odległość, oraz o usuwaniu wcześniej analizowanych lini ze zbioru wszystkich lini.  
+As you can see in the animation above, the next step after finding the beginning of the lane is to find the closest line counting from the end of the lane. We use this algorithm in a loop. Remember to change the line from which we measure the distance, and to remove previously analyzed lines from the set of all lines.  
    
-**Animacja algorytmu**  
+**Animation of the algorithm**  
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/linedetect.gif)  
    
-**Fragment kodu**   
-Niżej zamieszczam fragmenty kodu z dodatkowymi komentarzami odpowiedzialne za opisany algorytm 
-
-Fragment odpowiedzialny za wywołanie funkcji:
+**Code fragment**.   
+Below are the code fragments with additional comments responsible for the described algorithm    
+note: code have been through translator so if you find any errors compare to the original   
+   
+The fragment responsible for the function call:
 > lineDetection.py
 ```python
-import lineDetectionHandleLines as Lines      # odwołanie do pliku z algorytmem
-startingPoints=[[246, 460, 246, 450], [411, 460, 411, 450]]     # zadanie linie od których zaczynamy poszukiwanie pierwszych pasów
-left_line = Lines.detectBirdLines(startingPoints[0], lines, 55, numberOfLines=numberOfSteps)      # wywołanie funkcji
+import lineDetectionHandleLines as Lines # reference to the algorithm file
+startingPoints=[[246, 460, 246, 450], [411, 460, 411, 450]]     # task of lines from which we start searching for the first lanes
+left_line = Lines.detectBirdLines(startingPoints[0], lines, 55, numberOfLines=numberOfSteps) # function call
 ```  
  
-Zasadnicza funkcja:
+Main function:
 > lineDetecionHandleLines.py
 ```python
 def detectBirdLines(line_start, lines, maxDist=40, numberOfLines=0):
     """
-    :param line_start: linia od ktorej szukamy
-    :param lines: wszystkie linie
-    :param maxDist: maksymalna odleglosc lini
-    :param numberOfLines: ilosc krokow, jezeli 0 - do ostatniej wykrytej
-    :return: tablica lini w jednym pasie
+    :param line_start: the line from which we are looking for
+    :param lines: all lines
+    :param maxDist: maximum line distance
+    :param numberOfLines: number of steps, if 0 - to the last detected line
+    :return: array of lines in one lane
     """
-    detectedLines=[]                                                                          # zapisuje znalezione linie
-    krok=0                                                                                    # dodaje możliwość zadania maksymalnej liczby kroków 
-    while True if numberOfLines==0 else krok<numberOfLines:                                   # jeżeli zadana liczba kroków to 0 ignoruj licznik, w przeciwnym raze ogranicz liczbę pętli
-        closestLineslist=distaceBetweenPoints(line_start, lines, True, displacement=True)     # zwróć dla każdej lini [odleglosc, przesuniecie na x, indeks (jeżeli sortowanie)]
-        closestLine=closestLineslist[0]                                 # przypisz najbliższą linie do zmiennej
-        if closestLine[0] <= maxDist:                                   # jeżeli odl mniejsza niż maksymalna
-            chosenLine=lines[int(closestLine[2])]                           # zapisz linie (odwołanie do prawdziwej lini nie tablicy z odleglosciami)
-            detectedLines.append(chosenLine)                                # dodaj znalezioną linie do tablicy
-            line_start=chosenLine                                           # nadpisz linie od której szukamy
-        else:                                                           # jeżeli odl większa nisz maksymalna
-            return detectedLines                                            # zwróć tablice z wykrytymi liniami
-        krok+=1                                                         # zwiększ licznik
-        lines=np.delete(lines, int(closestLineslist[0][2]), 0)          # usuń analizowaną linie z tablicy wszyst. lini
-    return detectedLines                                              # zwróć tablice z wykrytymi liniami
+    detectedLines=[] # saves the found lines
+    step=0 # adds the possibility to ask the maximum number of steps 
+    while True if numberOfLines==0 else step<numberOfLines:                                   # if the set number of steps is 0 ignore the counter, otherwise limit the number of loops
+        closestLineslist=distaceBetweenPoints(line_start, lines, True, displacement=True) # return for each line [distance, displacement on x, index (if sorting)]
+        closestLine=closestLineslist[0] # assign closest line to variable
+        if closestLine[0] <= maxDist:                                   # if odl less than maxDist
+            chosenLine=lines[int(closestLine[2])]                           # save the lines (reference to the real line not an array of distances)
+            detectedLines.append(chosenLine) # add the found line to the array
+            line_start=chosenLine # overwrite the line from which we are searching
+        else:                                                           # if distance greater than maximum
+            return detectedLines # return the array with the detected lines
+        step+=1 # increment the counter
+        lines=np.delete(lines, int(closestLineslist[0][2]), 0) # remove the detected line from the array of all lines
+    return detectedLines # return the array of detected lines
 ```
-### Dodatkowe materiały:
+### Additional materials:
 ![GIF](https://github.com/M1chol/rcCar/blob/main/Zdjęcia/Budowa/car2-2.gif)
 
 ---
   
-## 3. W przyszłości
-1. Poprawienie problemu z wykrywaniem początkowego pasa -> zapisywanie ostatniej lokalizacji wykrytych lini i odwoływanie się do nich w kolejnych krokach
-2. Stabilny zwrot kątu do skrętu
-3. Autonomiczna jazda i PID
+## 3. In the future
+1. improve the problem of detecting the initial lane -> save the last location of detected lines and refer to them in subsequent steps
+2. stable return of angle to turn
+3. autonomous driving and PID
