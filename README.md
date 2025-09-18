@@ -1,3 +1,6 @@
+> [!NOTE]
+> This project is not beeing maintained. You can visit the current version [here](https://github.com/M1chol/jetson-car).
+
 # Remotely controlled autonomous car
 I will present a detailed description of building a simple autonomous car below. The parts I used are found [here](https://github.com/M1chol/rcCar/blob/main/Inne/czesci.md). In addition to the listed components, cables and connectors will also be needed. Of course, a soldering iron will be required to assemble the whole thing. The scripts folder contains all the programs I wrote to get the car running. Please feel free to contact me if you have any additional questions.
 
